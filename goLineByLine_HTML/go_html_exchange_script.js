@@ -166,13 +166,10 @@ function js_go_1_returnReadText(inpStr) {
 	var inpTab = "";
 	for(var v=0; v < numInpRighe; v++) {
 		var cols = righe[v].split( parm_separ );
-		var numCols=cols.length; 
-		if (numCols <= maxPrmCol) {
-			for(var m=numCols; m <= maxPrmCol; m++) { cols.push(""); }  
-		}
-		if (parm_col_lang1 < numCols)  inpTab +=  "<tr><td>" + cols[parm_col_lang1]; else  inpTab +=  "<tr><td>"; 	
-		if (parm_col_lang2 < numCols)  inpTab += "</td><td>" + cols[parm_col_lang2]; else  inpTab += "</td><td>"; 
-		if (parm_col_lang3 < numCols)  inpTab += "</td><td>" + cols[parm_col_lang3]+ "</td></tr>\n"; else  inpTab += "</td><td>" + "</td></tr>\n"; 
+		var numCols=cols.length; 		
+		if ((parm_col_lang1 >=0) && (parm_col_lang1 < numCols))  inpTab +=  "<tr><td>" + cols[parm_col_lang1]; else  inpTab +=  "<tr><td>"; 	
+		if ((parm_col_lang2 >=0) && (parm_col_lang2 < numCols))  inpTab += "</td><td>" + cols[parm_col_lang2]; else  inpTab += "</td><td>"; 
+		if ((parm_col_lang3 >=0) && (parm_col_lang3 < numCols))  inpTab += "</td><td>" + cols[parm_col_lang3]+ "</td></tr>\n"; else  inpTab += "</td><td>" + "</td></tr>\n"; 
 	} 
 	document.getElementById("inp1").innerHTML = "\n" + inpTab + "\n";
 		
