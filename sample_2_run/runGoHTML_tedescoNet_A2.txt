@@ -1,0 +1,11 @@
+// parametri per eseguire LineByLine, far precedere eventuali commenti da un //  
+
+title  	 =German Text Level A2
+folder   =../sample_data  
+file  	 =germanText_A2.csv    // tipo file csv 
+separ  	 = | 
+col_lang1 	= 0               // numero di colonna con testo in lingua originale 
+col_lang2 	= 1               // numero di colonna con testo tradotto 
+col_lang3 	= 4               // numero di colonna con informaz. supplementari es. paradigma verbo, plurale dei nomi 
+language1_2 = de_DE           // sigla della lingua del testo originale      (es. de_DE, en_EN )
+language2_2 = en_EN           // sigla della lingua del testo tradotto       (es. it_IT )
