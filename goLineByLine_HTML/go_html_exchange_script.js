@@ -13,10 +13,11 @@ var parm_file   		= "mioFile.csv";      // file formato csv
 var parm_separ  		= "|";  			  // |   \t \n  
 var parm_col_lang1 	= 0;                  // numero di colonna con frasi in lingua originale 
 var parm_col_lang2 	= 1;                  // numero di colonna con frasi tradotte 
-var parm_col_lang3 	= "";                 // numero di colonna con informaz. supplementari es. paradigma verbo, plurale dei nomi 
+var parm_col_lang3 	= -1;                 // numero di colonna con informaz. supplementari es. paradigma verbo, plurale dei nomi 
 var parm_language1_2 = "de_DE";           // de_DE  sigla della lingua l'originale      (es. de_DE, en_EN )
 var parm_language2_2 = "it_IT";           // de_DE  sigla della lingua per la traduzione(es. it_IT )
-	
+var parm_sortTextLength = "false";        // if true sort input by length of the text in original language  
+var sw_parm_sortTextLength = false;
 //-----------------------------------------------------------------------
 	
 function js_call_go_on_html_body_load() {  // called by  html page body onload
@@ -64,10 +65,11 @@ function js_go_1_returnFileZero(inpStr) {
 	parm_separ  		= "|";  		   // {tab}  significa \t cioè tabulazione 
 	parm_col_lang1 	= 0;                   // numero di colonna con frasi in lingua originale 
 	parm_col_lang2 	= 1;                   // numero di colonna con frasi tradotte 
-	parm_col_lang3 	= "";                   // numero di colonna informaz. suppl. es. plurale nomi, paradigma verbi 
+	parm_col_lang3 	= -1;                  // numero di colonna informaz. suppl. es. plurale nomi, paradigma verbi 
 	parm_language1_2 = "de_DE";            // de_DE  sigla della lingua l'originale      (es. de_DE, en_EN )
 	parm_language2_2 = "it_IT";            // de_DE  sigla della lingua per la traduzione(es. it_IT )
-	var maxColVal = 99;
+	parm_sortTextLength = "false";         // if true sort input by length of the text in original language  
+	sw_parm_sortTextLength = false;
 	var righe = inpStr.split("\n");
 	
 	for(var v=0; v < righe.length; v++) {
@@ -76,7 +78,7 @@ function js_go_1_returnFileZero(inpStr) {
 		var key = cols[0].trim().toLowerCase();
 		var valueC = cols[1].split("//");
 		var value  = valueC[0].trim(); 
-		console.log("key=" + key +", value=" + value + "<==");  
+		//console.log("key=" + key +", value=" + value + "<==");  
 		if	 (key == "title") 			parm_title  = value; 	
 		else if (key == "folder") 		parm_folder = value; 	
 		else if (key == "file")   		parm_file   = value; 	
@@ -88,12 +90,12 @@ function js_go_1_returnFileZero(inpStr) {
 		**/
 		else if (key == "language1_2" ) parm_language1_2 = value; 	
 		else if (key == "language2_2" ) parm_language2_2 = value; 
+		else if (key == "sorttextlength") sw_parm_sortTextLength = (value == "true");
 		else if (key.substr(0,8) == "col_lang") {
 				var valueNum=-1;				
 				try{ 
 					valueNum = parseInt(value); 
 					if (isNaN(valueNum)) valueNum=-1;
-					if (valueNum > maxColVal) valueNum = -1; 
 				} catch(err) {}; 
 				if 		(key == "col_lang1")   	parm_col_lang1   = valueNum; 	
 				else if (key == "col_lang2") 	parm_col_lang2   = valueNum;
@@ -111,6 +113,7 @@ function js_go_1_returnFileZero(inpStr) {
 		"col_lang3",  	" \t", parm_col_lang3 , 	"\n", 
 		"language1_2",  " \t", parm_language1_2, "\n",
 		"language2_2",  " \t", parm_language2_2, "\n",
+		"sw_parm_sortTextLength",  " \t", sw_parm_sortTextLength, "\n",
 		""); 
 	
 	if (parm_separ == "{tab}") {parm_separ = "\t"; }	
@@ -158,13 +161,38 @@ function js_go_1_returnReadText(inpStr) {
 	ele1.value = inpStr; 
 	ele1.parentElement.style.display = "block"; 	
 	***/
+	var FILLER_num = 100000;
 	var righe = inpStr.split("\n");
+	var lenArr =[];
+	var v;	
 	var numInpRighe = righe.length; 
 	let ele2 = document.getElementById("id_readMsg");
 	ele2.innerHTML = "lette " + numInpRighe + " righe";
 	var maxPrmCol=Math.max(parm_col_lang1,parm_col_lang2, parm_col_lang3);
+	if (sw_parm_sortTextLength) {
+		console.log("sort righe per lunghezza testo in lingua originale");
+		for(v=0; v < numInpRighe; v++) {
+			var cols = righe[v].split( parm_separ );
+			var numCols=cols.length; 	
+			var len1=0;	
+			if ((parm_col_lang1 >=0) && (parm_col_lang1 < numCols))  {
+				 len1 = cols[parm_col_lang1].length;
+			}	
+			lenArr.push( len1*FILLER_num + v );
+		}
+		lenArr.sort(function(a, b){return a - b});
+			
+	} else {
+		for(v=0; v < numInpRighe; v++) {
+			lenArr.push(FILLER_num+v);
+		}
+	}	
+	//--------------------------	
 	var inpTab = "";
-	for(var v=0; v < numInpRighe; v++) {
+	for(var v00=0; v00 < lenArr.length; v00++) {
+		var len1 = lenArr[v00];	
+		v = len1%FILLER_num;
+		if (v == len1) continue; // lunghezza del testo è zero 
 		var cols = righe[v].split( parm_separ );
 		var numCols=cols.length; 		
 		if ((parm_col_lang1 >=0) && (parm_col_lang1 < numCols))  inpTab +=  "<tr><td>" + cols[parm_col_lang1]; else  inpTab +=  "<tr><td>"; 	
