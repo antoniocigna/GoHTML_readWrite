@@ -6,7 +6,13 @@ license MIT: you can share and modify the software, but you must include the lic
 /* jshint strict: true */
 /* jshint esversion: 6 */
 /* jshint undef: true, unused: true */
+//--------------------------------------------------------   
+//  ... html_EXCHANGE_SCRIPT
 //-----------------------------------------------
+let file_LOCALSTOR_folder = "";
+let file_LOCALSTOR_name   = "";
+let file_LOCALSTOR_str    = "";
+
 var parm_title=""
 var parm_folder 		= "./"; 
 var parm_file   		= "mioFile.csv";      // file formato csv
@@ -19,7 +25,8 @@ var parm_language2_2 = "it_IT";           // de_DE  sigla della lingua per la tr
 var parm_sortTextLength = "false";        // if true sort input by length of the text in original language  
 var sw_parm_sortTextLength = false;
 //-----------------------------------------------------------------------
-	
+var runByGo = true;	
+//-----------------------------------------
 function js_call_go_on_html_body_load() {  // called by  html page body onload
 	var msg1 = "html loaded"; 
 	console.log("html is ready"); 
@@ -38,16 +45,34 @@ function js_call_go_on_html_body_load() {  // called by  html page body onload
 
 function js_go_ready(inpStr) {
 	// this function is run by go
-	console.log("go is ready ", inpStr); 
+	//console.log("go is ready ", inpStr); 
 	
 	document.getElementById("id_start001").style.display = "none";
 	//document.getElementById("id_myPage01").style.display = "flex"; 
 	
-	leggiFileZERO( inpStr ); 
+	//????leggiFileZERO( inpStr ); 
+	
+	var str1 = inpStr.split("::LOCALSTOR=");
+	if (str1.length < 4)  { str1.push(""); str1.push(); str1.push();str1.push();}
+	var parmStr=""; 
+	
+	[ parmStr, file_LOCALSTOR_folder,   file_LOCALSTOR_name,  file_LOCALSTOR_str ] = str1;
+
+	console.log("%cjs_go_ready","color:blue;")
+	/**
+	console.log("parmfile str=\n\t", str1[0],"\nfile_LOCALSTOR_folder", file_LOCALSTOR_folder, "\nfile_LOCALSTOR_name=", file_LOCALSTOR_name, 
+		"\nfile_LOCALSTOR_str=", file_LOCALSTOR_str);
+	**/	
+	if (file_LOCALSTOR_str == "") {  file_LOCALSTOR_str = JSON.stringify("")}	
+		
+	localStorage.setItem(cbc_LOCALSTOR_key,  file_LOCALSTOR_str)
+	
+	js_go_1_returnFileZero( parmStr );
+	
 	
 } // end of js_go_ready
 //--------------------------------------------------------------
-function leggiFileZERO(inpStr) {
+function TOGLIleggiFileZERO(inpStr) {
 	console.log("LEGGI FILE ZERO XXXXXXXXX" , "  parm=>", inpStr); 
 	var parmFile = inpStr.split(",")
 	js_go_setError("");
@@ -58,7 +83,7 @@ function leggiFileZERO(inpStr) {
 }
 //-----------------
 function js_go_1_returnFileZero(inpStr) {
-	console.log("return File ZERO ==>" , inpStr) 
+	//console.log("return File ZERO ==>" , inpStr) 
 	parm_title=""
 	parm_folder 		= "./"; 
 	parm_file   		= "mioFile.csv";   // file formato csv
@@ -103,6 +128,7 @@ function js_go_1_returnFileZero(inpStr) {
 		}		
 	} 
 	
+	/**
 	console.log("\n",  
 		"title", 		" \t", parm_title, 	"\n",  
 		"folder",  		" \t", parm_folder, 	"\n",  
@@ -115,6 +141,7 @@ function js_go_1_returnFileZero(inpStr) {
 		"language2_2",  " \t", parm_language2_2, "\n",
 		"sw_parm_sortTextLength",  " \t", sw_parm_sortTextLength, "\n",
 		""); 
+	**/
 	
 	if (parm_separ == "{tab}") {parm_separ = "\t"; }	
 		
@@ -206,7 +233,7 @@ function js_go_1_returnReadText(inpStr) {
 } // end of js_go_1_returnReadText
 //--------------------------------------------------
 
-function onclick_2_writeFile( id_outFolder, id_outTxtFile, id_outStr) {
+function TOGLIonclick_2_writeFile( id_outFolder, id_outTxtFile, id_outStr) {
 	
 	// ask go program to write string to a file
 	
@@ -224,12 +251,13 @@ function onclick_2_writeFile( id_outFolder, id_outTxtFile, id_outStr) {
 	
 } // end of onclick_2_writeFile
 //-------------------------------------
-function js_go_2_returnWriteFile(msg1) {	
-
+function js_go_2_returnWriteFile(msg1) {		
 	// return message with the write operation result
 	
+	/**
 	let ele1 = document.getElementById("id_writeMsg");
 	ele1.innerHTML = msg1;
+	**/
 }
 //--------------------------------------------------	
 
@@ -239,3 +267,88 @@ function js_go_setError(msg1) {
 	ele1.innerHTML = msg1; 
 }
 //--------------------
+
+//------------------------------------------------------------
+const LOCALSTOR_key = document.title;
+//-------------------------------------
+
+let LOCALSTOR_content_array = [];    // contenuto da salvare su localstor  
+//---------------------------------------
+
+//------------------------------------------------
+ function localStorage_setItemFile(cbc_LOCALSTOR_key, LOCALSTOR_content_array) {
+	
+	// Save Data to Local Storage
+	
+	file_LOCALSTOR_str = JSON.stringify( LOCALSTOR_content_array ); 
+	
+	/*
+	console.log("%clocalStorage_setItemFile() cbc_LOCALSTOR_key=" + cbc_LOCALSTOR_key, "color:blue; font-weight:bold;font-size:1.2em;") 
+	
+	console.log("localStorage_setItemFile() --> goFunCalledByJS_mgr() --> funCalledByJs_2_writeFile --> \n\tlocaStor folder=",  file_LOCALSTOR_folder,
+		"\n\tlocalStor  filename=",  file_LOCALSTOR_name, 
+		"\n\tlocalStor  str 	=", file_LOCALSTOR_str,  "4","5"); 
+	*/
+  //goFunCalledByJS_mgr( "funCalledByJs_localStor_setItem" , "localStorage_print", LOCALSTOR_key, valStr1,  "3","4","5");  
+  goFunCalledByJS_mgr( "funCalledByJs_2_writeFile" , "js_go_2_returnLocalStorWrite",  file_LOCALSTOR_folder,file_LOCALSTOR_name, file_LOCALSTOR_str,  "4","5");   
+ 
+ }	// end of localStorage_setItemFile
+ //-------------------------------------------------------------------
+ function js_go_2_returnLocalStorWrite(inpStr) {
+	 //console.log("return local storage write msg=", inpStr)
+	 
+ }
+ //-------------------------------------------------
+function localStorage_setData() {	
+	if (go_is_ready == false) { return; }
+	// Save Data to Local Storage
+	
+	var valStr1 = JSON.stringify( LOCALSTOR_content_array ); 
+	
+	//window.localStorage.setItem( LOCALSTOR_key, JSON.stringify( LOCALSTOR_content_array ) );
+	
+  //goFunCalledByJS_mgr( "funCalledByJs_localStor_setItem" , "localStorage_print", LOCALSTOR_key, valStr1,  "3","4","5");   
+	goFunCalledByJS_mgr( "funCalledByJs_localStor_setItem" , "",                   LOCALSTOR_key, valStr1,  "3","4","5");   
+	
+} // end of localStorage_setData
+//------------------------------------------------------------------------------
+function localStorage_removeKey(key) {
+	//Remove Data from Local Storage
+	if (key == null) return; 
+	return; 
+    cambiaGo_window.localStorage.removeItem(key);
+}
+//------------------------------------
+function localStorage_list( inpKey ) {
+	// se inpKey manca, lista tutte le chiavi, se esiste solo la chiave richiesta 
+	for (var i = 0, len = cambiaGo_window.localStorage.length; i < len; i++) {
+		var key = cambiaGo_window.localStorage.key(i);
+		if (inpKey) { if (key != inpKey) continue; }
+		var value = cambiaGo_window.localStorage[key];
+		console.log("window.localStorage key=" + key + " ==> " + value.replaceAll( ",[" ,    ",\n\t[") );
+	}
+		
+} // end of list_localStorageItems()
+//------------------------------------
+function localStorage_keyList() {
+	goFunCalledByJS_mgr( "funCalledByJs_localStor_print", "","","","","");  
+	/**
+	for (var i = 0, len = cambiaGo_window.localStorage.length; i < len; i++) {
+		console.log( "window.localStorage key=", cambiaGo_window.localStorage.key(i)); 
+	}
+	**/		
+} // end of list_localStorageItems()
+//------------------------------------
+function localStorage_print() {
+	console.log("localStorage_print () "); 
+  //goFunCalledByJS_mgr( "funCalledByJs_localStor_getItem" , "localStorage_getData_go2_back", LOCALSTOR_key, "2","3","4","5");   
+	goFunCalledByJS_mgr( "funCalledByJs_localStor_print",    "",                              "",            "","","","");  
+	/**
+	for (var i = 0, len = cambiaGo_window.localStorage.length; i < len; i++) {
+		console.log( "window.localStorage key=", cambiaGo_window.localStorage.key(i)); 
+	}
+	**/		
+} // end of list_localStorageItems()
+//-----------------------------------------------
+//   end of localStorage_routines.js
+//-----------------------------------------------

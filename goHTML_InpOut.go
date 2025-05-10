@@ -54,7 +54,10 @@ var sw_begin_ended = false
 var sw_HTML_ready  = false     
 //var apiceInverso = `40`  //  in windows:  tasto Alt + 96 (tastierino numerico)
 //---------------------------
-
+var title string
+var	localStorageFolder string
+var localStorageFile   string
+	
 var fileHtml = ""
 var parmFolder = ""
 var parmFile = ""
@@ -66,6 +69,7 @@ var outFileName = "textFileOut.txt"
 //---------------
 // end of g01_declare.go
 //-----------------------------------------
+
 //--------------------------------
 func main() {
 
@@ -87,6 +91,8 @@ func main() {
 		fmt.Println( red( "errore in lorca "), err )  //  //log.Fatal(err)
 	}
 	defer ui.Close()
+	
+	
 	
 	bind_go_func_to_js()  //  bind inside is executed asynchronously after calling from js function (html/js are ready) 
 	
@@ -164,6 +170,78 @@ func getPgmArgs() {
 //-----------------------------------------------------------
 //end of g00_main.go
 //------------------------------------------------------
+func read_localStorageFile() string {
+	
+	test_folder_exist(localStorageFolder, "read_localStorageFile")
+	if sw_stop {return ""}	
+	_, err := os.Stat( localStorageFolder + "/" + localStorageFile )
+	if err != nil { // file does not exist
+		return ""
+	} 
+	
+	sw_stop = false
+	bytesPerRow:= 100
+    righe := rowListFromFile( localStorageFolder, localStorageFile, "localStorageFile", "read_file", bytesPerRow)  
+	if sw_stop { righe = []string{} }
+	//if len(righe) == 0) {}
+	return strings.Join(righe,"\n")
+}
+
+//-------------------------------------
+func readParmAndLocalStor() {
+	//funCalledByJs_1_readFile( parmFolder, parmFile, "js_go_1_returnFileZero") 
+	//????&&go_exec_js_function("js_go_ready",parmFolder + "," + parmFile)	
+	//--------------------------------------
+	sw_stop = false
+	bytesPerRow:= 100
+    righe := rowListFromFile( parmFolder, parmFile, "file input", "read_file", bytesPerRow)  
+	if sw_stop { return }
+	keyLocalStorFolder := strings.ToLower("sessionSaveFolder")
+	lang1:=""
+	lang2:=""
+	/**
+	language1_2 = de_DE           // sigla della lingua del testo originale      (es. de_DE, en_EN )
+language2_2 = it_IT           // sigla della lingua del testo tradotto       (es. it_IT )
+	**/
+	for v:=0; v < len(righe); v++ {			
+		cols:= strings.Split(righe[v],"=") 
+		if len(cols) < 2 {continue} 
+		key:= strings.ToLower(strings.TrimSpace(cols[0]) )
+		if len(key) < 2 {continue}
+		if key[0:2] == "//" { continue }
+		value:= cols[1]
+		j1:= strings.Index(value, "//")
+		if (j1 > 0 ) {
+			value = value[0:j1]
+		}
+		value = strings.TrimSpace(value)
+		
+		switch key {
+			case keyLocalStorFolder:  	localStorageFolder = value 			
+			case "language1_2":  		lang1 = value 	
+			case "language2_2":  		lang2 = value 	
+			case "title":  title  = value 		
+		}
+	}   
+	localStorageFile = "LS_lineByLine_" + lang1[0:2] + "_" + lang2[0:2] + ".LocS" 
+	
+	fmt.Println("\nletti file parametri ", parmFile, " nella cartella ", parmFolder)   
+	fmt.Println("title=", title)
+	fmt.Println("parametri passati fra sessioni memorizzati nel file ", localStorageFile, "\n\t\t nella cartella ", localStorageFolder)
+	 
+	localStorage_string:= read_localStorageFile()
+	//if sw_stop {return }
+	
+	go_exec_js_function("js_go_ready", strings.Join(righe,"\n") + 
+			"::LOCALSTOR=" + localStorageFolder +
+			"::LOCALSTOR=" + localStorageFile   + 
+			"::LOCALSTOR=" + localStorage_string)	
+	
+	//go_exec_js_function( js_function, strings.Join(righe, "\n"));
+	
+} // end of funCalledByJs_1_readFile	
+		
+		
 
 //------------------------------------------------
 //g03_html_env.go	
@@ -263,12 +341,12 @@ func putFileError( msg1, inpFile string) {
 // end of g03_html_env.go	
 //--------------------------------------------------------
 
-//-------------------------------------------
 func bind_go_func_to_js() {		
 
 		ui.Bind("goFunCalledByJS_mgr", 
 			func(goFunc string, js_function string, var1 string, var2 string, var3 string, var4 string, var5 string ) { 				
 				switch goFunc {
+					//case "funCalledByJs_localStor_getItem" , localStorage_getData_go2_back( var1, js_function);   	
 					case "funCalledByJs_0_html_is_ready":    funCalledByJs_0_html_is_ready(  var1, js_function)  
 					case "funCalledByJs_1_readFile"     :    funCalledByJs_1_readFile( var1, var2, js_function) 
 					case "funCalledByJs_2_writeFile"    :    funCalledByJs_2_writeFile(var1, var2, var3, js_function)  			
@@ -324,8 +402,12 @@ func funCalledByJs_2_writeFile(outFolder string, outTxtFile string, outStr strin
 } // end of funCalledByJs_2_writeFile	
 
 //--------------------------------------
-
-
+/**
+func get_last_localStorage() {
+	localStorage_getData_go2_back( LOCALSTOR_key, "2","3","4","5");   	
+}
+**/
+//-------------------------------------------
 
 //-----------
 //g04_begin.go
@@ -341,12 +423,20 @@ func begin() {
 		
 	} else {		
 		fmt.Println(cyan("\nREADY"), "\n") 
-		
-		go_exec_js_function("js_go_ready",parmFolder + "," + parmFile)	
+		readParmAndLocalStor()
+		//go_exec_js_function("js_go_ready",parmFolder + "," + parmFile)	
 	}
 	
 }// end of begin	
-
+//-------------------
+/**
+--> js_goready-->let inpFolder  = parmFile[0];
+	let inpTxtFile = parmFile[1];  //  "parametri.txt";	
+	console.log("parmFile=", parmFile)
+	goFunCalledByJS_mgr( "funCalledByJs_1_readFile", "js_go_1_returnFileZero", inpFolder, inpTxtFile,"","","");  	
+}}}}
+funCalledByJs_1_readFile( parmFolder, parmFile, "js_go_1_returnFileZero") 
+***/
 //--------------------------------
 
 // end g04_begin.go
@@ -549,7 +639,7 @@ func writeList2( outFolder string, outTxtFile string, lines []string)  {
 		showErrMsg2(errorMSG, "writeList")			
 		return
     } else {
-	  fmt.Println( green("scritte") , len(lines), " righe nel file ", fileName ) 
+	  //fmt.Println( green("scritte") , len(lines), " righe nel file ", fileName ) 
 	}
 } 
 //-----------------------------------------------
