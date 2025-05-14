@@ -1,0 +1,16 @@
+// parametri per eseguire LineByLine, far precedere eventuali commenti da un //  
+//--------------------------------
+sessionSaveFolder = sample_go_localStor  // in questa cartella vengono memorizzati i parametri modificati, 
+//                  il file name contiene language1_2 e language2_2          es. LS_lineByLine_de_it.LocS     
+//------------------------------------------------------------------------
+title  	 =German Text Level A1
+folder   =../sample_data  
+file  	 =germanText_A2.csv    // tipo file csv 
+separ  	 = | 
+col_lang1 	= 0               // numero di colonna con testo in lingua originale 
+col_lang2 	= 1               // numero di colonna con testo tradotto 
+col_lang3 	= 4               // numero di colonna con informaz. supplementari es. paradigma verbo, plurale dei nomi 
+col_lang4 	= --              // traduzione secondaria (per es. in italiano, mentre l'altra è in inglese 
+language1_2 = de_DE           // sigla della lingua del testo originale      (es. de_DE, en_EN )
+language2_2 = en_US           // sigla della lingua del testo tradotto       (es. it_IT )
+sortTextLength = false        //  sort per lunghezza del testo in lingua originale

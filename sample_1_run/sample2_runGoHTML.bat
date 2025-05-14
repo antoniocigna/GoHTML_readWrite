@@ -6,5 +6,5 @@
 set htmlFile=D:/Users/Pc Anto/Documents/GitHub/LineByLine_V3/LineByLineV3/goLineByLine_html_readWriteFile.html
 set exeFile=D:/Users/Pc Anto/Documents/GitHub/GoHTML_readWrite/goHTML_InpOut.exe
 
-"%exeFile%" -html "%htmlFile%" -parm "./" "miei_parametri.txt"
+"%exeFile%" -html "%htmlFile%" -parm "./" "miei_parametri2.txt"
 
