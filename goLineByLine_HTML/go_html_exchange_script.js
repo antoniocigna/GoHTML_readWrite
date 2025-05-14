@@ -20,6 +20,7 @@ var parm_separ  		= "|";  			  // |   \t \n
 var parm_col_lang1 	= 0;                  // numero di colonna con frasi in lingua originale 
 var parm_col_lang2 	= 1;                  // numero di colonna con frasi tradotte 
 var parm_col_lang3 	= -1;                 // numero di colonna con informaz. supplementari es. paradigma verbo, plurale dei nomi 
+var parm_col_lang4 	= -1;                 // numero di colonna con frasi tradotte in un'altra lingua (es. lang2 = italiano, lang4 = inglese   
 var parm_language1_2 = "de_DE";           // de_DE  sigla della lingua l'originale      (es. de_DE, en_EN )
 var parm_language2_2 = "it_IT";           // de_DE  sigla della lingua per la traduzione(es. it_IT )
 var parm_sortTextLength = "false";        // if true sort input by length of the text in original language  
@@ -91,6 +92,7 @@ function js_go_1_returnFileZero(inpStr) {
 	parm_col_lang1 	= 0;                   // numero di colonna con frasi in lingua originale 
 	parm_col_lang2 	= 1;                   // numero di colonna con frasi tradotte 
 	parm_col_lang3 	= -1;                  // numero di colonna informaz. suppl. es. plurale nomi, paradigma verbi 
+	parm_col_lang4 	= -1;                  // numero di colonna con frasi tradotte in un'altra lingua (es. lang2 = italiano, lang4 = inglese   
 	parm_language1_2 = "de_DE";            // de_DE  sigla della lingua l'originale      (es. de_DE, en_EN )
 	parm_language2_2 = "it_IT";            // de_DE  sigla della lingua per la traduzione(es. it_IT )
 	parm_sortTextLength = "false";         // if true sort input by length of the text in original language  
@@ -107,12 +109,7 @@ function js_go_1_returnFileZero(inpStr) {
 		if	 (key == "title") 			parm_title  = value; 	
 		else if (key == "folder") 		parm_folder = value; 	
 		else if (key == "file")   		parm_file   = value; 	
-		else if (key == "separ")  		parm_separ  = value;
-		/**
-		else if (key == "col_lang1")   	parm_col_lang1   = value; 	
-		else if (key == "col_lang2") 	parm_col_lang2   = value;
-		else if (key == "col_lang3") 	parm_col_lang3   = value;
-		**/
+		else if (key == "separ")  		parm_separ  = value;		
 		else if (key == "language1_2" ) parm_language1_2 = value; 	
 		else if (key == "language2_2" ) parm_language2_2 = value; 
 		else if (key == "sorttextlength") sw_parm_sortTextLength = (value == "true");
@@ -125,6 +122,7 @@ function js_go_1_returnFileZero(inpStr) {
 				if 		(key == "col_lang1")   	parm_col_lang1   = valueNum; 	
 				else if (key == "col_lang2") 	parm_col_lang2   = valueNum;
 				else if (key == "col_lang3") 	parm_col_lang3   = valueNum;
+				else if (key == "col_lang4") 	parm_col_lang4   = valueNum;
 		}		
 	} 
 	
@@ -195,7 +193,7 @@ function js_go_1_returnReadText(inpStr) {
 	var numInpRighe = righe.length; 
 	let ele2 = document.getElementById("id_readMsg");
 	ele2.innerHTML = "lette " + numInpRighe + " righe";
-	var maxPrmCol=Math.max(parm_col_lang1,parm_col_lang2, parm_col_lang3);
+	var maxPrmCol=Math.max(parm_col_lang1,parm_col_lang2, parm_col_lang3, parm_col_lang3);
 	if (sw_parm_sortTextLength) {
 		console.log("sort righe per lunghezza testo in lingua originale");
 		for(v=0; v < numInpRighe; v++) {
@@ -222,9 +220,12 @@ function js_go_1_returnReadText(inpStr) {
 		if (v == len1) continue; // lunghezza del testo è zero 
 		var cols = righe[v].split( parm_separ );
 		var numCols=cols.length; 		
-		if ((parm_col_lang1 >=0) && (parm_col_lang1 < numCols))  inpTab +=  "<tr><td>" + cols[parm_col_lang1]; else  inpTab +=  "<tr><td>"; 	
-		if ((parm_col_lang2 >=0) && (parm_col_lang2 < numCols))  inpTab += "</td><td>" + cols[parm_col_lang2]; else  inpTab += "</td><td>"; 
-		if ((parm_col_lang3 >=0) && (parm_col_lang3 < numCols))  inpTab += "</td><td>" + cols[parm_col_lang3]+ "</td></tr>\n"; else  inpTab += "</td><td>" + "</td></tr>\n"; 
+		inpTab +=  "<tr>";
+		if ((parm_col_lang1 >=0) && (parm_col_lang1 < numCols))  inpTab += "<td>" + cols[parm_col_lang1] + "</td>"; else  inpTab +=  "<td></td>"; 	
+		if ((parm_col_lang2 >=0) && (parm_col_lang2 < numCols))  inpTab += "<td>" + cols[parm_col_lang2] + "</td>"; else  inpTab +=  "<td></td>";  
+		if ((parm_col_lang3 >=0) && (parm_col_lang3 < numCols))  inpTab += "<td>" + cols[parm_col_lang3] + "</td>"; else  inpTab +=  "<td></td>";  
+		if ((parm_col_lang4 >=0) && (parm_col_lang4 < numCols))  inpTab += "<td>" + cols[parm_col_lang4] + "</td>"; else  inpTab +=  "<td></td>"; 
+		inpTab += "</tr>\n"; 
 	} 
 	document.getElementById("inp1").innerHTML = "\n" + inpTab + "\n";
 		
